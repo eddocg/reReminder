@@ -12,7 +12,7 @@
     <string name="master_next_in">Nächste: %1$s in %2$s</string>
     <string name="master_next_at">Nächste: %1$s um %2$s</string>
     <string name="master_next_on">Nächste: %1$s startet %2$s</string>
-    <string name="reminder_default_name">Erinnerung</string>
+    <string name="reminder_default_name">Pausenzeit</string>
     <string name="next_in">in %1$s</string>
     <string name="paused">Pausiert</string>
     <string name="not_started_yet">Noch nicht gestartet</string>
@@ -72,7 +72,7 @@
     <string name="variable_next">Nächster Termin</string>
 
     <!-- Interval picker -->
-    <string name="interval_dialog_title">Erinnerungsintervall festlegen</string>
+    <string name="interval_dialog_title">Pausenintervall</string>
 
     <!-- Startdatum und -zeit -->
     <string name="start_dialog_title">Erste Erinnerung</string>
@@ -93,16 +93,13 @@
     <string name="action_back">Zurück</string>
 
     <!-- Notification content -->
-    <string name="reminder_notification_text">Deine Nachricht</string>
+    <string name="reminder_notification_text">Steh auf, streck dich und gönn deinen Augen eine Pause.</string>
     <string name="notification_channel_name">Erinnerungen</string>
-    <string name="notification_channel_description">Erinnerungsbenachrichtigungen. reReminder spielt den Ton jeder Erinnerung selbst ab, daher bleibt dieser Kanal stumm.</string>
+    <string name="notification_channel_description">Erinnerungsbenachrichtigungen. Break Alarm spielt den Ton jeder Erinnerung selbst ab, daher bleibt dieser Kanal stumm.</string>
 
     <!-- Settings -->
-    <string name="settings_group_alerts">Signale</string>
-    <string name="ringtone_title">Benachrichtigungston</string>
     <string name="ringtone_picker_title">Ton auswählen</string>
     <string name="default_label">Standard</string>
-    <string name="settings_alerts_hint">\"Standard\" in einer Erinnerung spielt diese Töne. Jede Erinnerung wählt im Editor ihren eigenen Ton oder die Sprachausgabe, und der Lautsprecher-Knopf über der Liste schaltet alles auf einmal stumm.</string>
 
     <string name="vibration_enabled_label">Vibration</string>
     <string name="vibration_pattern_title">Vibrationsmuster</string>
@@ -115,10 +112,10 @@
     <string name="dkma_do_not_show_again">Nicht mehr anzeigen</string>
 
     <!-- Geführte Ersteinrichtung -->
-    <string name="setup_title">Damit Erinnerungen ankommen</string>
-    <string name="setup_subtitle">Android stoppt Hintergrund-Apps standardmäßig. Ein paar schnelle Schalter, und deine Erinnerungen kommen pünktlich.</string>
+    <string name="setup_title">Damit Pausen pünktlich klingeln</string>
+    <string name="setup_subtitle">Android stoppt Hintergrund-Apps standardmäßig. Ein paar schnelle Schalter, und dein Pausenalarm klingelt pünktlich, auch bei ausgeschaltetem Bildschirm.</string>
     <string name="setup_continue">Weiter</string>
-    <string name="setup_finish">reReminder starten</string>
+    <string name="setup_finish">Break Alarm starten</string>
     <string name="setup_skip_hint">Den Rest kannst du später unter Einstellungen &gt; Zuverlässigkeit erledigen.</string>
     <string name="setup_step_done">Erledigt</string>
     <string name="setup_step_optional">Optional, aber ohne kommen Erinnerungen womöglich zu spät.</string>
@@ -138,12 +135,12 @@
 
     <!-- Zuverlässigkeits-Hinweis -->
     <string name="reliability_prompt_title">Erinnerungen könnten verzögert werden</string>
-    <string name="reliability_prompt_intro">Android kann reReminder im Hintergrund stoppen. Auf diesem Gerät:</string>
+    <string name="reliability_prompt_intro">Android kann Break Alarm im Hintergrund stoppen. Auf diesem Gerät:</string>
     <string name="reliability_issue_exact_alarms">Exakte Alarme sind blockiert, Erinnerungen können sich verschieben oder ausfallen.</string>
     <string name="reliability_issue_battery">Die Akku-Optimierung schränkt die App ein.</string>
     <string name="reliability_issue_vendor">%1$s-Geräte stoppen Hintergrund-Apps aggressiver, als Android es vorsieht.</string>
     <string name="reliability_issue_vendor_generic">Dieses Gerät stoppt Hintergrund-Apps möglicherweise aggressiver, als Android es vorsieht.</string>
-    <string name="reliability_prompt_open_settings">In den reReminder-Einstellungen beheben</string>
+    <string name="reliability_prompt_open_settings">In den Break-Alarm-Einstellungen beheben</string>
     <string name="reliability_prompt_open_guide">Anleitung öffnen</string>
     <string name="reliability_manufacturer_summary_vendor">%1$s-Anleitung auf dontkillmyapp.com öffnen</string>
 
@@ -151,7 +148,7 @@
 
     <!-- Reliability -->
     <string name="settings_group_reliability">Zuverlässigkeit</string>
-    <string name="reliability_hint">Erinnerungen nutzen exakte Alarme. Sind diese eingeschränkt, kann Android sie verzögern oder verwerfen.</string>
+    <string name="reliability_hint">Pausen nutzen exakte Alarme. Ist unten etwas eingeschränkt, kann Android sie verzögern, stummschalten oder verbergen.</string>
     <string name="reliability_exact_alarms">Exakte Alarme</string>
     <string name="reliability_exact_alarms_on">Erlaubt</string>
     <string name="reliability_exact_alarms_off">Blockiert — zum Erlauben tippen</string>
@@ -254,13 +251,8 @@
     <string name="sound_preview">Anhören</string>
     <string name="sound_preview_stop">Stopp</string>
     <string name="sound_preview_phrase">So klingt deine Erinnerung.</string>
-    <string name="alarm_tone_title">Weckerton</string>
     <string name="snooze_title">Schlummerdauer</string>
     <string name="snooze_minutes">%1$d Min.</string>
-    <string name="speech_stream_title">Vorlesen in der Lautstärke von</string>
-    <string name="speech_stream_notification">Benachrichtigungen</string>
-    <string name="speech_stream_media">Medien</string>
-    <string name="speech_stream_alarm">Weckern</string>
     <string name="alarm_ringing">Klingelt</string>
     <string name="alarm_dismiss">Beenden</string>
     <string name="alarm_snooze">Schlummern</string>
@@ -272,7 +264,7 @@
     <string name="channel_sound_name">Erinnerungen · %1$s</string>
     <string name="channel_sound_vibrate_name">Erinnerungen · %1$s · vibrieren</string>
     <string name="channel_vibrate_only_name">Erinnerungen · nur vibrieren</string>
-    <string name="channel_sound_description">Erinnerungen mit diesem Ton. reReminder legt pro gewähltem Ton einen solchen Kanal an und entfernt ihn, sobald ihn keine Erinnerung mehr nutzt.</string>
+    <string name="channel_sound_description">Erinnerungen mit diesem Ton. Break Alarm legt pro gewähltem Ton einen solchen Kanal an und entfernt ihn, sobald ihn keine Erinnerung mehr nutzt.</string>
     <string name="notification_missed_title">Verpasst: %1$s</string>
     <string name="notification_missed_text">War fällig %1$s</string>
 
@@ -285,7 +277,83 @@
     <string name="sort_next">Nächste zuerst</string>
     <string name="list_deleted">„%1$s“ gelöscht</string>
     <string name="action_undo">Rückgängig</string>
-    <string name="settings_group_display">Anzeige</string>
-    <string name="compact_list_title">Kompakte Liste</string>
-    <string name="compact_list_summary">Nur Name und wann sie als Nächstes fällig ist</string>
+
+    <!-- Break Alarm: Hauptbildschirm -->
+    <string name="break_every">Alle %1$s</string>
+    <string name="break_state_paused">Pausiert</string>
+    <string name="break_state_ready">Bereit</string>
+    <string name="break_state_next_break">Nächste Pause</string>
+    <string name="break_state_snoozed">Schlummert</string>
+    <string name="break_state_until_break">Bis zur Pause</string>
+    <string name="break_countdown_a11y">%1$s: %2$s %3$s</string>
+    <plurals name="countdown_minutes">
+        <item quantity="one">%1$d Minute</item>
+        <item quantity="other">%1$d Minuten</item>
+    </plurals>
+    <plurals name="countdown_seconds">
+        <item quantity="one">%1$d Sekunde</item>
+        <item quantity="other">%1$d Sekunden</item>
+    </plurals>
+    <string name="break_status_idle">Tippe auf Start für eine Pause alle %1$s.</string>
+    <string name="break_status_paused">Pausiert. Fortsetzen startet einen neuen Countdown von %1$s.</string>
+    <string name="break_status_not_scheduled">Keine Pause passt in deine Arbeitszeiten.</string>
+    <string name="break_status_snoozed">Schlummert bis %1$s</string>
+    <string name="break_status_outside_hours">Außerhalb der Arbeitszeit. Nächste Pause %1$s</string>
+    <string name="break_status_running">Nächste Pause um %1$s</string>
+    <string name="break_start">Start</string>
+    <string name="break_pause">Pause</string>
+    <string name="break_resume">Fortsetzen</string>
+    <string name="break_stop">Stopp</string>
+    <string name="working_hours_any_time">Pausen jederzeit</string>
+    <string name="working_hours_summary">Arbeitszeit: %1$s</string>
+    <string name="interval_decrease">Kürzeres Intervall</string>
+    <string name="interval_increase">Längeres Intervall</string>
+    <string name="interval_restarts_hint">Eine Änderung des Intervalls startet den Countdown neu.</string>
+    <string name="readiness_title">Dein Pausenalarm klingelt eventuell nicht</string>
+    <string name="readiness_fix">Beheben</string>
+    <string name="readiness_notifications">Benachrichtigungen sind blockiert</string>
+    <string name="readiness_exact_alarms">Exakte Alarme sind nicht erlaubt</string>
+    <string name="readiness_full_screen">Alarme dürfen den Sperrbildschirm nicht überdecken</string>
+    <string name="readiness_alarm_volume">Weckerlautstärke ist stumm</string>
+
+    <!-- Break Alarm: Alarmbildschirm -->
+    <string name="alarm_silenced">Ton beendet. Schließe oder schlummere, wenn du so weit bist.</string>
+    <string name="alarm_next_break">Nächste Pause um %1$s</string>
+
+    <!-- Break Alarm: Einrichtung -->
+    <string name="setup_full_screen_title">Alarm über dem Sperrbildschirm zeigen</string>
+    <string name="setup_full_screen_body">Ab Android 14 muss eine App fragen, bevor sie den Sperrbildschirm überdecken darf. Ohne diese Erlaubnis klingelt der Pausenalarm trotzdem, aber nur als Benachrichtigung.</string>
+    <string name="setup_full_screen_action">Vollbild-Einstellung öffnen</string>
+
+    <!-- Break Alarm: Einstellungen -->
+    <string name="settings_group_alarm">Alarm</string>
+    <string name="settings_alarm_hint">Break Alarm ändert nie die Lautstärke deines Telefons. Die Lautheit oben skaliert nur den eigenen Ton innerhalb der Weckerlautstärke.</string>
+    <string name="sound_soft_chime">Sanftes Glockenspiel</string>
+    <string name="sound_gentle_bell">Leise Glocke</string>
+    <string name="sound_calm_tone">Ruhiger Klangteppich</string>
+    <string name="sound_preview_named">%1$s anhören</string>
+    <string name="sound_preview_stop_named">Vorschau von %1$s stoppen</string>
+    <string name="alarm_volume_title">Lautheit</string>
+    <string name="alarm_volume_value">%1$d %%</string>
+    <string name="alarm_volume_hint">Relativ zur Weckerlautstärke des Telefons. Der Ton wird sanft lauter.</string>
+    <string name="sound_timeout_title">Ton beenden nach</string>
+    <string name="sound_timeout_hint">Schließen und Schlummern bleiben verfügbar, nachdem der Ton endet.</string>
+    <string name="duration_seconds">%1$d s</string>
+    <string name="settings_group_working_hours">Arbeitszeit</string>
+    <string name="working_hours_switch">Nur während der Arbeitszeit</string>
+    <string name="working_hours_on_hint">Pausen behalten ihren Rhythmus und klingeln nur in diesen Zeiten</string>
+    <string name="working_hours_off_hint">Pausen klingeln jederzeit</string>
+    <string name="working_hours_edit">Tage und Uhrzeiten</string>
+    <string name="reliability_notifications">Benachrichtigungen</string>
+    <string name="reliability_notifications_on">Erlaubt</string>
+    <string name="reliability_notifications_off">Blockiert – tippen zum Erlauben</string>
+    <string name="reliability_full_screen">Vollbild-Alarm</string>
+    <string name="reliability_full_screen_on">Erlaubt</string>
+    <string name="reliability_full_screen_off">Nicht erlaubt – Alarme erscheinen als Benachrichtigung</string>
+    <string name="reliability_alarm_volume">Weckerlautstärke</string>
+    <string name="reliability_alarm_volume_on">Hörbar</string>
+    <string name="reliability_alarm_volume_off">Stumm – tippen für Toneinstellungen</string>
+    <string name="settings_group_about">Über</string>
+    <string name="about_title">Break Alarm %1$s</string>
+    <string name="about_body">Basiert auf reReminder von ProfessorQuantumUniverse. Freie Software unter der GNU GPL v3. Tippen, um den Quellcode anzusehen.</string>
 </resources>

@@ -4,6 +4,39 @@ All notable changes to reReminder are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Break Alarm 0.1.0] — Unreleased
+
+First version of the Break Alarm fork, based on reReminder 4.0.1. See
+[docs/BREAK_ALARM.md](docs/BREAK_ALARM.md).
+
+### Added
+
+- A single break alarm with a circular MM:SS countdown. Start, Pause, Resume and Stop.
+  Defaults to every 20 minutes and stays inactive until Start.
+- Three original gentle alarm sounds (Soft chime, Gentle bell, Calm ambient tone, CC0) with
+  preview, in-app loudness (10–100 % of the alarm volume), and an 8-second fade-in.
+- A sound timeout (30 s to 5 min), after which Dismiss and Snooze stay available.
+- Optional working hours (one window of days and hours).
+- A readiness card and settings rows for notifications, exact alarms, the Android 14+
+  full-screen permission, and a muted alarm volume. Also a first-run step for full-screen
+  alarms.
+
+### Changed
+
+- New identity: "Break Alarm", `io.github.eddocg.breakalarm`, version 0.1.0. The alarm screen's
+  task affinity follows the `applicationId`, so it no longer clashes with an installed reReminder.
+- A soft green Material 3 theme. Dynamic colour is now off by default.
+- Settings are reduced to what a break alarm needs. The reminder list and editor are no longer
+  reachable.
+- Default snooze is now 5 minutes.
+
+### Fixed
+
+- A snooze that would ring at or after the next regular alarm is dropped instead of ringing
+  twice in a row. Dismissing an alarm now also clears a pending snooze.
+- After the clock is set back past a timer's start, the next alarm is still at most one
+  interval away instead of waiting out the correction.
+
 ## [4.0.1] — 2026-10-12
 
 A hotfix for time windows.

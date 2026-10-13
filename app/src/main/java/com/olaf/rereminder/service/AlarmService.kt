@@ -7,10 +7,13 @@ import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.media.AudioAttributes
 import android.os.Build
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.os.PowerManager
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.olaf.rereminder.R
 import com.olaf.rereminder.data.MessageTemplate
@@ -37,6 +40,10 @@ data class RingingAlarm(
     val eventAt: Long,
     val colorIndex: Int,
     val snoozeMinutes: Int,
+    /** The next regular alarm, already armed when this one started ringing; 0 when none. */
+    val nextAt: Long = 0L,
+    /** The sound timed out; the alarm waits quietly for Dismiss or Snooze. */
+    val silenced: Boolean = false,
 )
 
 /**
@@ -47,13 +54,16 @@ data class RingingAlarm(
  * `systemExempted`, which Android 14 reserves for apps that hold the exact-alarm permission and
  * use the service to keep an alarm going — exactly this.
  *
- * Nobody around to stop it? After [AUTO_STOP_MILLIS] it goes quiet and leaves a "missed" note.
- * A second alarm arriving while one rings takes over; the first one becomes "missed" too.
+ * Nobody around to stop it? After the sound timeout from Settings it goes quiet but stays up, so
+ * Dismiss and Snooze are still there when the user comes back. Left alone for
+ * [SILENCED_HOLD_MILLIS] after that, it closes with a "missed" note. A second alarm arriving
+ * while one is up takes over; the first one becomes "missed" too.
  */
 class AlarmService : Service() {
 
     private var player: AlertPlayer? = null
     private var wakeLock: PowerManager.WakeLock? = null
+    private val handler = Handler(Looper.getMainLooper())
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -64,7 +74,12 @@ class AlarmService : Service() {
                 eventAt = intent.getLongExtra(ReminderScheduler.EXTRA_EVENT_AT, System.currentTimeMillis()),
             )
 
-            ACTION_DISMISS -> stopRinging()
+            ACTION_DISMISS -> {
+                // Dismiss ends this occurrence for good; the regular grid carries on regardless.
+                _ringing.value?.let { ReminderScheduler(this).clearSnooze(it.reminderId) }
+                stopRinging()
+            }
+
             ACTION_SNOOZE -> {
                 _ringing.value?.let { ReminderScheduler(this).snooze(it.reminderId, it.snoozeMinutes) }
                 stopRinging()
@@ -86,6 +101,7 @@ class AlarmService : Service() {
             eventAt = eventAt,
             colorIndex = reminder?.colorIndex ?: 0,
             snoozeMinutes = preferences.getSnoozeMinutes(),
+            nextAt = reminder?.nextTriggerAt ?: 0L,
         )
 
         // startForegroundService() obliges us to go foreground promptly, whatever happens next.
@@ -117,16 +133,18 @@ class AlarmService : Service() {
 
         // Taking over from an alarm nobody answered: that one counts as missed.
         _ringing.value?.let { previous -> markMissed(previous) }
+        handler.removeCallbacksAndMessages(null)
         val previousPlayer = player
         player = null
         previousPlayer?.stop()
 
+        val soundMillis = preferences.getSoundTimeoutSeconds() * 1_000L
         _ringing.value = alarm
-        acquireWakeLock()
-        play(reminder, alarm, preferences)
+        acquireWakeLock(soundMillis + WAKE_LOCK_MARGIN_MILLIS)
+        play(reminder, alarm, preferences, soundMillis)
     }
 
-    private fun play(reminder: Reminder, alarm: RingingAlarm, preferences: PreferenceHelper) {
+    private fun play(reminder: Reminder, alarm: RingingAlarm, preferences: PreferenceHelper, soundMillis: Long) {
         val spoken = listOf(alarm.title, alarm.message).filter { it.isNotBlank() }.joinToString(". ")
         // The top-bar mode wins here too: a muted phone gets a silent alarm screen.
         val mode = preferences.getAlertMode()
@@ -145,19 +163,43 @@ class AlarmService : Service() {
             context = this,
             usage = AudioAttributes.USAGE_ALARM,
             loop = true,
-            maxMillis = AUTO_STOP_MILLIS,
+            maxMillis = soundMillis,
+            gain = preferences.getAlarmVolumePercent() / 100f,
+            fadeInMillis = FADE_IN_MILLIS,
         )
         player = newPlayer
         newPlayer.play(
             sound = sound,
             vibration = if (vibrate) VibrationHelper.alarmPattern(preferences.getVibrationPattern()) else null,
         ) {
-            // Finishing on its own means the time limit ran out with nobody there.
-            if (player === newPlayer && _ringing.value == alarm) {
-                markMissed(alarm)
+            // Finishing on its own means the sound timeout ran out with nobody there.
+            if (player === newPlayer && _ringing.value == alarm) silence(alarm)
+        }
+    }
+
+    /**
+     * Stops the sound and vibration but keeps the alarm up, so it can still be dismissed or
+     * snoozed. Nothing needs the CPU while it waits, so the wake lock goes too.
+     */
+    private fun silence(alarm: RingingAlarm) {
+        player = null
+        val quiet = alarm.copy(silenced = true)
+        _ringing.value = quiet
+        releaseWakeLock()
+        try {
+            NotificationManagerCompat.from(this).notify(NotificationHelper.ALARM_NOTIFICATION_ID, buildNotification(quiet))
+        } catch (e: SecurityException) {
+            // Notifications were revoked mid-alarm; the alarm screen still offers both actions.
+            Log.w(TAG, "Could not update the alarm notification", e)
+        }
+        // Uptime-based, so a sleeping phone may close it a little later; the next alarm takes
+        // over in any case.
+        handler.postDelayed({
+            if (_ringing.value == quiet) {
+                markMissed(quiet)
                 stopRinging()
             }
-        }
+        }, SILENCED_HOLD_MILLIS)
     }
 
     private fun markMissed(alarm: RingingAlarm) {
@@ -167,6 +209,7 @@ class AlarmService : Service() {
     }
 
     private fun stopRinging() {
+        handler.removeCallbacksAndMessages(null)
         val current = player
         player = null
         _ringing.value = null
@@ -177,6 +220,7 @@ class AlarmService : Service() {
     }
 
     override fun onDestroy() {
+        handler.removeCallbacksAndMessages(null)
         player?.stop()
         player = null
         _ringing.value = null
@@ -188,11 +232,17 @@ class AlarmService : Service() {
         NotificationCompat.Builder(this, NotificationHelper.CHANNEL_ALARMS)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(alarm.title)
-            .setContentText(alarm.message.ifBlank { getString(R.string.alarm_ringing) })
+            .setContentText(
+                when {
+                    alarm.silenced -> getString(R.string.alarm_silenced)
+                    else -> alarm.message.ifBlank { getString(R.string.alarm_ringing) }
+                }
+            )
             .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setOngoing(true)
+            .setOnlyAlertOnce(true)
             .setWhen(alarm.eventAt)
             .setShowWhen(true)
             .setContentIntent(activityIntent())
@@ -214,11 +264,11 @@ class AlarmService : Service() {
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
     )
 
-    private fun acquireWakeLock() {
-        if (wakeLock?.isHeld == true) return
+    private fun acquireWakeLock(timeoutMillis: Long) {
+        releaseWakeLock()
         wakeLock = getSystemService(PowerManager::class.java)
             ?.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WAKE_LOCK_TAG)
-            ?.apply { acquire(AUTO_STOP_MILLIS + 30_000L) }
+            ?.apply { acquire(timeoutMillis) }
     }
 
     private fun releaseWakeLock() {
@@ -229,7 +279,9 @@ class AlarmService : Service() {
     companion object {
         private const val TAG = "AlarmService"
         private const val WAKE_LOCK_TAG = "reReminder:alarm"
-        const val AUTO_STOP_MILLIS = 5 * 60_000L
+        private const val WAKE_LOCK_MARGIN_MILLIS = 30_000L
+        private const val FADE_IN_MILLIS = 8_000L
+        const val SILENCED_HOLD_MILLIS = 30 * 60_000L
 
         private const val ACTION_START = "com.olaf.rereminder.action.ALARM_START"
         const val ACTION_DISMISS = "com.olaf.rereminder.action.ALARM_DISMISS"

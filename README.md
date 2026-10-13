@@ -1,3 +1,16 @@
+> [!NOTE]
+> ## This fork: Break Alarm
+> This repository is **Break Alarm**, a modified version of [reReminder](https://github.com/ProfessorQuantumUniverse/reReminder)
+> by ProfessorQuantumUniverse, changed by Eddo in October 2026. It narrows reReminder down to a single
+> recurring break alarm: a circular countdown, Start/Pause/Resume/Stop, three gentle bundled sounds, a
+> sound timeout, and optional working hours. It installs as `io.github.eddocg.breakalarm`, so it lives
+> side by side with reReminder.
+>
+> Like the original it is free software under the [GNU GPL v3](LICENSE); upstream's copyright and
+> attribution are kept. See [docs/BREAK_ALARM.md](docs/BREAK_ALARM.md) for what changed, the alarm
+> semantics, building, testing and device validation, and [docs/SOUNDS.md](docs/SOUNDS.md) for the
+> sounds' origin and license. The rest of this README describes upstream reReminder.
+
 <div align="center">
 
 <!-- LOGO SECTION (Replace logo.png with your actual icon path if you have one, or remove the line) -->

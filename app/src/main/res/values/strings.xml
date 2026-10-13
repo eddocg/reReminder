@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name" translatable="false">reReminder</string>
+    <string name="app_name" translatable="false">Break Alarm</string>
 
     <!-- Timer list -->
     <string name="settings_title">Settings</string>
@@ -14,7 +14,7 @@
     <string name="master_next_in">Next: %1$s in %2$s</string>
     <string name="master_next_at">Next: %1$s at %2$s</string>
     <string name="master_next_on">Next: %1$s starts %2$s</string>
-    <string name="reminder_default_name">Reminder</string>
+    <string name="reminder_default_name">Break time</string>
     <string name="next_in">in %1$s</string>
     <string name="paused">Paused</string>
     <string name="not_started_yet">Not started</string>
@@ -74,7 +74,7 @@
     <string name="variable_next">Next event</string>
 
     <!-- Interval picker -->
-    <string name="interval_dialog_title">Set reminder interval</string>
+    <string name="interval_dialog_title">Break interval</string>
 
     <!-- Start date and time -->
     <string name="start_dialog_title">First reminder</string>
@@ -95,16 +95,13 @@
     <string name="action_back">Back</string>
 
     <!-- Notification content -->
-    <string name="reminder_notification_text">Your message</string>
+    <string name="reminder_notification_text">Stand up, stretch, and rest your eyes.</string>
     <string name="notification_channel_name">Reminders</string>
-    <string name="notification_channel_description">Reminder notifications. reReminder plays each reminder\'s own sound, so this channel stays silent.</string>
+    <string name="notification_channel_description">Reminder notifications. Break Alarm plays each reminder\'s own sound, so this channel stays silent.</string>
 
     <!-- Settings -->
-    <string name="settings_group_alerts">Alerts</string>
-    <string name="ringtone_title">Notification sound</string>
     <string name="ringtone_picker_title">Select a sound</string>
     <string name="default_label">Default</string>
-    <string name="settings_alerts_hint">\"Default\" in a reminder plays these sounds. Each reminder picks its own sound or speech in its editor, and the speaker button above the list mutes everything at once.</string>
 
     <string name="vibration_enabled_label">Vibration</string>
     <string name="vibration_pattern_title">Vibration pattern</string>
@@ -117,10 +114,10 @@
     <string name="dkma_do_not_show_again">Don\'t show again</string>
 
     <!-- Guided first run -->
-    <string name="setup_title">Let\'s make reminders stick</string>
-    <string name="setup_subtitle">Android stops background apps by default. A few quick switches and your reminders will arrive on time.</string>
+    <string name="setup_title">Let\'s make breaks ring on time</string>
+    <string name="setup_subtitle">Android stops background apps by default. A few quick switches and your break alarm will ring on time, even with the screen off.</string>
     <string name="setup_continue">Continue</string>
-    <string name="setup_finish">Start using reReminder</string>
+    <string name="setup_finish">Start using Break Alarm</string>
     <string name="setup_skip_hint">You can finish the rest later under Settings &gt; Reliability.</string>
     <string name="setup_step_done">Done</string>
     <string name="setup_step_optional">Optional, but reminders may be late without it.</string>
@@ -140,12 +137,12 @@
 
     <!-- Reliability notice -->
     <string name="reliability_prompt_title">Reminders may be delayed</string>
-    <string name="reliability_prompt_intro">Android can stop reReminder in the background. On this device:</string>
+    <string name="reliability_prompt_intro">Android can stop Break Alarm in the background. On this device:</string>
     <string name="reliability_issue_exact_alarms">Exact alarms are blocked, so reminders can drift or be skipped.</string>
     <string name="reliability_issue_battery">Battery optimisation is restricting the app.</string>
     <string name="reliability_issue_vendor">%1$s devices stop background apps more aggressively than Android does.</string>
     <string name="reliability_issue_vendor_generic">This device may stop background apps more aggressively than Android does.</string>
-    <string name="reliability_prompt_open_settings">Fix this in reReminder settings</string>
+    <string name="reliability_prompt_open_settings">Fix this in Break Alarm settings</string>
     <string name="reliability_prompt_open_guide">Open the guide</string>
     <string name="reliability_manufacturer_summary_vendor">Open the %1$s guide on dontkillmyapp.com</string>
 
@@ -153,7 +150,7 @@
 
     <!-- Reliability -->
     <string name="settings_group_reliability">Reliability</string>
-    <string name="reliability_hint">Reminders use exact alarms. If these are restricted, Android may delay or drop them.</string>
+    <string name="reliability_hint">Breaks use exact alarms. If anything below is restricted, Android may delay, silence or hide them.</string>
     <string name="reliability_exact_alarms">Exact alarms</string>
     <string name="reliability_exact_alarms_on">Allowed</string>
     <string name="reliability_exact_alarms_off">Blocked — tap to allow</string>
@@ -256,13 +253,8 @@
     <string name="sound_preview">Preview</string>
     <string name="sound_preview_stop">Stop</string>
     <string name="sound_preview_phrase">This is how your reminder will sound.</string>
-    <string name="alarm_tone_title">Alarm sound</string>
     <string name="snooze_title">Snooze length</string>
     <string name="snooze_minutes">%1$d min</string>
-    <string name="speech_stream_title">Speak at the volume of</string>
-    <string name="speech_stream_notification">Notifications</string>
-    <string name="speech_stream_media">Media</string>
-    <string name="speech_stream_alarm">Alarms</string>
     <string name="alarm_ringing">Ringing</string>
     <string name="alarm_dismiss">Dismiss</string>
     <string name="alarm_snooze">Snooze</string>
@@ -274,7 +266,7 @@
     <string name="channel_sound_name">Reminders · %1$s</string>
     <string name="channel_sound_vibrate_name">Reminders · %1$s · vibrate</string>
     <string name="channel_vibrate_only_name">Reminders · vibrate only</string>
-    <string name="channel_sound_description">Reminders that use this sound. reReminder creates one such channel per sound you pick and removes it when no reminder uses it any more.</string>
+    <string name="channel_sound_description">Reminders that use this sound. Break Alarm creates one such channel per sound you pick and removes it when no reminder uses it any more.</string>
     <string name="notification_missed_title">Missed: %1$s</string>
     <string name="notification_missed_text">Was due %1$s</string>
 
@@ -287,7 +279,83 @@
     <string name="sort_next">Next alert first</string>
     <string name="list_deleted">“%1$s” deleted</string>
     <string name="action_undo">Undo</string>
-    <string name="settings_group_display">Display</string>
-    <string name="compact_list_title">Compact list</string>
-    <string name="compact_list_summary">Only the name and when it is next due</string>
+
+    <!-- Break Alarm: main screen -->
+    <string name="break_every">Every %1$s</string>
+    <string name="break_state_paused">Paused</string>
+    <string name="break_state_ready">Ready</string>
+    <string name="break_state_next_break">Next break</string>
+    <string name="break_state_snoozed">Snoozed</string>
+    <string name="break_state_until_break">Until your break</string>
+    <string name="break_countdown_a11y">%1$s: %2$s %3$s</string>
+    <plurals name="countdown_minutes">
+        <item quantity="one">%1$d minute</item>
+        <item quantity="other">%1$d minutes</item>
+    </plurals>
+    <plurals name="countdown_seconds">
+        <item quantity="one">%1$d second</item>
+        <item quantity="other">%1$d seconds</item>
+    </plurals>
+    <string name="break_status_idle">Tap Start for a break every %1$s.</string>
+    <string name="break_status_paused">Paused. Resume starts a fresh %1$s countdown.</string>
+    <string name="break_status_not_scheduled">No break fits your working hours.</string>
+    <string name="break_status_snoozed">Snoozed until %1$s</string>
+    <string name="break_status_outside_hours">Outside working hours. Next break %1$s</string>
+    <string name="break_status_running">Next break at %1$s</string>
+    <string name="break_start">Start</string>
+    <string name="break_pause">Pause</string>
+    <string name="break_resume">Resume</string>
+    <string name="break_stop">Stop</string>
+    <string name="working_hours_any_time">Breaks at any time</string>
+    <string name="working_hours_summary">Working hours: %1$s</string>
+    <string name="interval_decrease">Shorter interval</string>
+    <string name="interval_increase">Longer interval</string>
+    <string name="interval_restarts_hint">Changing the interval restarts the countdown.</string>
+    <string name="readiness_title">Your break alarm may not ring</string>
+    <string name="readiness_fix">Fix</string>
+    <string name="readiness_notifications">Notifications are blocked</string>
+    <string name="readiness_exact_alarms">Exact alarms are not allowed</string>
+    <string name="readiness_full_screen">Alarms cannot cover the lock screen</string>
+    <string name="readiness_alarm_volume">Alarm volume is muted</string>
+
+    <!-- Break Alarm: alarm screen -->
+    <string name="alarm_silenced">Sound stopped. Dismiss or snooze when you\'re ready.</string>
+    <string name="alarm_next_break">Next break at %1$s</string>
+
+    <!-- Break Alarm: setup -->
+    <string name="setup_full_screen_title">Show the alarm over the lock screen</string>
+    <string name="setup_full_screen_body">Android 14 and later ask before an app may cover the lock screen. Without it, the break alarm still rings, but only as a notification.</string>
+    <string name="setup_full_screen_action">Open the full-screen setting</string>
+
+    <!-- Break Alarm: settings -->
+    <string name="settings_group_alarm">Alarm</string>
+    <string name="settings_alarm_hint">Break Alarm never changes your phone\'s volume. The loudness above scales its own sound within the system alarm volume.</string>
+    <string name="sound_soft_chime">Soft chime</string>
+    <string name="sound_gentle_bell">Gentle bell</string>
+    <string name="sound_calm_tone">Calm ambient tone</string>
+    <string name="sound_preview_named">Preview %1$s</string>
+    <string name="sound_preview_stop_named">Stop preview of %1$s</string>
+    <string name="alarm_volume_title">Loudness</string>
+    <string name="alarm_volume_value">%1$d%%</string>
+    <string name="alarm_volume_hint">Relative to the phone\'s alarm volume. The sound fades in gently.</string>
+    <string name="sound_timeout_title">Stop sound after</string>
+    <string name="sound_timeout_hint">Dismiss and Snooze stay available after the sound stops.</string>
+    <string name="duration_seconds">%1$d s</string>
+    <string name="settings_group_working_hours">Working hours</string>
+    <string name="working_hours_switch">Only during working hours</string>
+    <string name="working_hours_on_hint">Breaks keep their rhythm and only ring inside these hours</string>
+    <string name="working_hours_off_hint">Breaks ring at any time</string>
+    <string name="working_hours_edit">Days and hours</string>
+    <string name="reliability_notifications">Notifications</string>
+    <string name="reliability_notifications_on">Allowed</string>
+    <string name="reliability_notifications_off">Blocked — tap to allow</string>
+    <string name="reliability_full_screen">Full-screen alarm</string>
+    <string name="reliability_full_screen_on">Allowed</string>
+    <string name="reliability_full_screen_off">Not allowed — alarms show as a notification</string>
+    <string name="reliability_alarm_volume">Alarm volume</string>
+    <string name="reliability_alarm_volume_on">Audible</string>
+    <string name="reliability_alarm_volume_off">Muted — tap to open sound settings</string>
+    <string name="settings_group_about">About</string>
+    <string name="about_title">Break Alarm %1$s</string>
+    <string name="about_body">Based on reReminder by ProfessorQuantumUniverse. Free software under the GNU GPL v3. Tap to view the source code.</string>
 </resources>

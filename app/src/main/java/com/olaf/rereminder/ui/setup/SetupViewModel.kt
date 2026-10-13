@@ -7,6 +7,7 @@ import android.os.Build
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import com.olaf.rereminder.service.ReminderScheduler
+import com.olaf.rereminder.utils.NotificationHelper
 import com.olaf.rereminder.utils.PreferenceHelper
 import com.olaf.rereminder.utils.Reliability
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,6 +41,8 @@ class SetupViewModel(application: Application) : AndroidViewModel(application) {
                 batteryUnrestricted = status.batteryUnrestricted,
                 vendor = status.vendor,
                 vendorGuideSeen = preferences.isVendorGuideSeen(),
+                supportsFullScreenSetting = Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE,
+                fullScreenAllowed = NotificationHelper.canUseFullScreenIntent(context),
             ),
             vendor = status.vendor,
             vendorName = status.vendorName,
@@ -78,6 +81,8 @@ class SetupViewModel(application: Application) : AndroidViewModel(application) {
         }
 
     fun exactAlarmIntents() = Reliability.exactAlarmIntents(getApplication())
+
+    fun fullScreenIntents() = Reliability.fullScreenIntents(getApplication())
 
     fun batteryIntents() = Reliability.batteryIntents(getApplication())
 

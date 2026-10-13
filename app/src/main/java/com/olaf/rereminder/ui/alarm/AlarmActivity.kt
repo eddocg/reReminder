@@ -27,7 +27,7 @@ import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Alarm
+import androidx.compose.material.icons.rounded.SelfImprovement
 import androidx.compose.material.icons.rounded.Snooze
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -58,7 +58,6 @@ import com.olaf.rereminder.R
 import com.olaf.rereminder.service.AlarmService
 import com.olaf.rereminder.service.RingingAlarm
 import com.olaf.rereminder.ui.theme.ReReminderTheme
-import com.olaf.rereminder.ui.theme.accentColor
 import com.olaf.rereminder.ui.theme.pressScale
 import com.olaf.rereminder.ui.theme.tap
 import com.olaf.rereminder.utils.TimeLabels
@@ -80,6 +79,16 @@ class AlarmActivity : ComponentActivity() {
                 val alarm by AlarmService.ringing.collectAsStateWithLifecycle()
                 LaunchedEffect(alarm) {
                     if (alarm == null) finish()
+                }
+                // Once the sound has timed out, the screen may go dark like any other; the alarm
+                // stays here (and in the notification) until it is answered.
+                val silenced = alarm?.silenced == true
+                LaunchedEffect(silenced) {
+                    if (silenced) {
+                        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                    } else {
+                        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                    }
                 }
                 alarm?.let { ringing ->
                     AlarmScreen(
@@ -103,7 +112,6 @@ class AlarmActivity : ComponentActivity() {
                     WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
             )
         }
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
 }
 
@@ -113,7 +121,8 @@ private fun AlarmScreen(
     onSnooze: () -> Unit,
     onDismiss: () -> Unit,
 ) {
-    val accent = accentColor(alarm.colorIndex)
+    val accent = MaterialTheme.colorScheme.primary
+    val onAccent = MaterialTheme.colorScheme.onPrimary
     val view = LocalView.current
 
     // One slow breath — present enough to read as "ringing", calm enough at 6 a.m.
@@ -151,11 +160,12 @@ private fun AlarmScreen(
                 Spacer(Modifier.weight(1f))
 
                 Box(contentAlignment = Alignment.Center) {
+                    // The halo stops breathing once the sound has stopped.
                     Box(
                         modifier = Modifier
                             .size(168.dp)
-                            .scale(haloScale)
-                            .graphicsLayer { alpha = haloAlpha }
+                            .scale(if (alarm.silenced) 1f else haloScale)
+                            .graphicsLayer { alpha = if (alarm.silenced) 0.12f else haloAlpha }
                             .background(accent, CircleShape),
                     )
                     Box(
@@ -165,9 +175,9 @@ private fun AlarmScreen(
                         contentAlignment = Alignment.Center,
                     ) {
                         Icon(
-                            Icons.Rounded.Alarm,
+                            Icons.Rounded.SelfImprovement,
                             contentDescription = null,
-                            tint = Color.White,
+                            tint = onAccent,
                             modifier = Modifier.size(48.dp),
                         )
                     }
@@ -190,17 +200,26 @@ private fun AlarmScreen(
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                 )
-                if (alarm.message.isNotBlank()) {
-                    Spacer(Modifier.height(8.dp))
-                    Text(
-                        text = alarm.message,
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        textAlign = TextAlign.Center,
-                        maxLines = 4,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                }
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    text = alarm.message.ifBlank { stringResource(R.string.reminder_notification_text) },
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                    maxLines = 4,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Spacer(Modifier.height(16.dp))
+                Text(
+                    text = when {
+                        alarm.silenced -> stringResource(R.string.alarm_silenced)
+                        alarm.nextAt > 0L -> stringResource(R.string.alarm_next_break, TimeLabels.clock(alarm.nextAt))
+                        else -> ""
+                    },
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                )
 
                 Spacer(Modifier.weight(1.4f))
 
@@ -236,7 +255,7 @@ private fun AlarmScreen(
                     Button(
                         onClick = { view.tap(); onDismiss() },
                         interactionSource = dismissSource,
-                        colors = ButtonDefaults.buttonColors(containerColor = accent, contentColor = Color.White),
+                        colors = ButtonDefaults.buttonColors(containerColor = accent, contentColor = onAccent),
                         modifier = Modifier
                             .weight(1f)
                             .height(64.dp)
@@ -260,11 +279,12 @@ private fun AlarmScreenPreview() {
         AlarmScreen(
             alarm = RingingAlarm(
                 reminderId = 1,
-                title = "Take medication",
-                message = "With a glass of water",
+                title = "Break time",
+                message = "",
                 eventAt = System.currentTimeMillis(),
-                colorIndex = 2,
-                snoozeMinutes = 10,
+                colorIndex = 0,
+                snoozeMinutes = 5,
+                nextAt = System.currentTimeMillis() + 20 * 60_000L,
             ),
             onSnooze = {},
             onDismiss = {},

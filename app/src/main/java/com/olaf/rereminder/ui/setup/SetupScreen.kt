@@ -36,6 +36,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material.icons.rounded.BatteryFull
 import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.Fullscreen
 import androidx.compose.material.icons.rounded.NotificationsActive
 import androidx.compose.material.icons.rounded.OpenInNew
 import androidx.compose.material.icons.rounded.PhoneAndroid
@@ -119,6 +120,7 @@ fun SetupRoute(
                 }
 
                 SetupStep.EXACT_ALARMS -> openOrExplain(viewModel.exactAlarmIntents())
+                SetupStep.FULL_SCREEN -> openOrExplain(viewModel.fullScreenIntents())
                 SetupStep.BATTERY -> openOrExplain(viewModel.batteryIntents())
                 SetupStep.MANUFACTURER -> {
                     viewModel.markVendorGuideSeen()
@@ -421,6 +423,7 @@ private fun StepBadge(index: Int, done: Boolean, icon: ImageVector) {
 private fun SetupStep.icon(): ImageVector = when (this) {
     SetupStep.NOTIFICATIONS -> Icons.Rounded.NotificationsActive
     SetupStep.EXACT_ALARMS -> Icons.Rounded.Schedule
+    SetupStep.FULL_SCREEN -> Icons.Rounded.Fullscreen
     SetupStep.BATTERY -> Icons.Rounded.BatteryFull
     SetupStep.MANUFACTURER -> Icons.Rounded.PhoneAndroid
 }
@@ -434,6 +437,7 @@ private fun SetupScreenPreview() {
                 steps = listOf(
                     SetupStepState(SetupStep.NOTIFICATIONS, done = true),
                     SetupStepState(SetupStep.EXACT_ALARMS, done = false),
+                    SetupStepState(SetupStep.FULL_SCREEN, done = false),
                     SetupStepState(SetupStep.BATTERY, done = false),
                     SetupStepState(SetupStep.MANUFACTURER, done = false),
                 ),

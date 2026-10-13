@@ -46,7 +46,15 @@ class AlertPlayer(
     /** Spoken reminders follow the stream chosen in Settings (#9). */
     private val speechUsage: Int = usage,
     private val maxMillis: Long = DEFAULT_MAX_MILLIS,
+    /**
+     * Tone loudness relative to the stream's own volume, 0..1. MediaPlayer can only attenuate,
+     * so this never makes an alarm louder than the user's alarm volume, nor touches that volume.
+     */
+    gain: Float = 1f,
+    /** Tones start quieter and rise to [gain] over this long, so an alarm doesn't startle. */
+    private val fadeInMillis: Long = 0L,
 ) {
+    private val gain = gain.coerceIn(0f, 1f)
     private val context = context.applicationContext
     private val handler = Handler(Looper.getMainLooper())
     private val audioManager = this.context.getSystemService(AudioManager::class.java)
@@ -90,7 +98,10 @@ class AlertPlayer(
             player.setAudioAttributes(attributes(usage))
             player.setDataSource(context, target)
             player.isLooping = loop
-            player.setOnPreparedListener { it.start() }
+            player.setOnPreparedListener {
+                rampVolume(it, step = if (fadeInMillis > 0L) 0 else RAMP_STEPS)
+                it.start()
+            }
             player.setOnCompletionListener { if (!loop) finish() }
             player.setOnErrorListener { _, what, extra ->
                 Log.w(TAG, "Tone failed ($what/$extra), trying the default")
@@ -104,6 +115,17 @@ class AlertPlayer(
             Log.w(TAG, "Could not play $target", e)
             releasePlayer()
             if (!isFallback) playTone(null, isFallback = true) else finishUnlessLooping()
+        }
+    }
+
+    /** Steps the volume from [RAMP_START] of [gain] up to [gain]; [finish] cancels the rest. */
+    private fun rampVolume(player: MediaPlayer, step: Int) {
+        if (finished || mediaPlayer !== player) return
+        val fraction = step.coerceAtMost(RAMP_STEPS).toFloat() / RAMP_STEPS
+        val level = gain * (RAMP_START + (1f - RAMP_START) * fraction)
+        runCatching { player.setVolume(level, level) }
+        if (step < RAMP_STEPS) {
+            handler.postDelayed({ rampVolume(player, step + 1) }, fadeInMillis / RAMP_STEPS)
         }
     }
 
@@ -218,6 +240,8 @@ class AlertPlayer(
         private const val TAG = "AlertPlayer"
         private const val UTTERANCE_ID = "reReminderAlert"
         const val DEFAULT_MAX_MILLIS = 30_000L
+        private const val RAMP_STEPS = 20
+        private const val RAMP_START = 0.3f
 
         fun attributes(usage: Int): AudioAttributes = AudioAttributes.Builder()
             .setUsage(usage)
@@ -238,8 +262,9 @@ class AlertPlayer(
         }
 
         /**
-         * What the reminder's own sound choice plays. "Default" is the notification or alarm
-         * sound picked in Settings — everything else is decided by the reminder alone.
+         * What the reminder's own sound choice plays. "Default" is the notification sound, or for
+         * alarms the bundled gentle sound, picked in Settings — everything else is decided by the
+         * reminder alone.
          */
         fun resolveSound(
             reminder: Reminder,
@@ -251,7 +276,7 @@ class AlertPlayer(
             SoundMode.TONE -> AlertSound.Tone(reminder.sound.toneUri?.toUri())
             SoundMode.SPEAK -> AlertSound.Speech(spokenText)
             SoundMode.DEFAULT -> AlertSound.Tone(
-                if (alarm) preferences.getAlarmTone() else preferences.getSelectedRingtone()
+                if (alarm) preferences.gentleSoundUri() else preferences.getSelectedRingtone()
             )
         }
 

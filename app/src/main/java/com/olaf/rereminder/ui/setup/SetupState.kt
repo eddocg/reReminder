@@ -29,6 +29,13 @@ enum class SetupStep(
         actionRes = R.string.setup_alarms_action,
         required = false,
     ),
+    /** Android 14+: without it the alarm arrives as a heads-up notification, not a full screen. */
+    FULL_SCREEN(
+        titleRes = R.string.setup_full_screen_title,
+        bodyRes = R.string.setup_full_screen_body,
+        actionRes = R.string.setup_full_screen_action,
+        required = false,
+    ),
     BATTERY(
         titleRes = R.string.setup_battery_title,
         bodyRes = R.string.setup_battery_body,
@@ -89,12 +96,17 @@ fun buildSetupSteps(
     batteryUnrestricted: Boolean,
     vendor: DkmaVendor?,
     vendorGuideSeen: Boolean,
+    supportsFullScreenSetting: Boolean = false,
+    fullScreenAllowed: Boolean = true,
 ): List<SetupStepState> = buildList {
     if (needsNotificationPermission) {
         add(SetupStepState(SetupStep.NOTIFICATIONS, notificationsGranted))
     }
     if (supportsExactAlarmSetting) {
         add(SetupStepState(SetupStep.EXACT_ALARMS, exactAlarmsAllowed))
+    }
+    if (supportsFullScreenSetting) {
+        add(SetupStepState(SetupStep.FULL_SCREEN, fullScreenAllowed))
     }
     add(SetupStepState(SetupStep.BATTERY, batteryUnrestricted))
     // Only for the manufacturers that actually break background alarms; there is nothing to

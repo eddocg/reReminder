@@ -8,15 +8,18 @@ plugins {
 }
 
 android {
+    // The Kotlin package stays upstream's so changes from reReminder keep merging cleanly.
     namespace = "com.olaf.rereminder"
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "com.olaf.rereminder"
+        // Break Alarm is a fork of reReminder (com.olaf.rereminder). A distinct id lets both be
+        // installed side by side. Provisional: derived from the GitHub account hosting the fork.
+        applicationId = "io.github.eddocg.breakalarm"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = 8
-        versionName = "4.0.1"
+        versionCode = 1
+        versionName = "0.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

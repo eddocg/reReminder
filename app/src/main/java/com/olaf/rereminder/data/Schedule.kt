@@ -76,6 +76,20 @@ fun Reminder.nextAlertAfter(fromMillis: Long, zone: ZoneId = ZoneId.systemDefaul
     return best
 }
 
+/**
+ * The snooze worth keeping at [nowMillis], or 0 for none.
+ *
+ * A snooze delays the alarm that just rang; it is not an extra loop. One that came due while the
+ * phone was off is dropped rather than rung late, and so is one that would ring at or after the
+ * next regular alert ([nextAlertAt]): that alert already brings the reminder back, and keeping
+ * both would ring twice in a row.
+ */
+fun snoozeToKeep(snoozeUntil: Long, nowMillis: Long, nextAlertAt: Long?): Long = when {
+    snoozeUntil <= nowMillis -> 0L
+    nextAlertAt != null && snoozeUntil >= nextAlertAt -> 0L
+    else -> snoozeUntil
+}
+
 /** True when [alertAt] is an alert this schedule really produces — not a stale leftover. */
 fun Reminder.producesAlertAt(alertAt: Long, zone: ZoneId = ZoneId.systemDefault()): Boolean =
     nextAlertAfter(alertAt - 1, zone)?.alertAt == alertAt
@@ -135,11 +149,16 @@ private fun Reminder.nextIntervalEventAfter(fromMillis: Long, zone: ZoneId): Lon
     return null
 }
 
-/** The first tick of `base + k·interval` after [after]; `k` starts at 0 only if [includeBase]. */
+/**
+ * The first tick of `base + k·interval` after [after].
+ *
+ * A pinned start ([includeBase]) is the first event, so `k` never drops below 0. A timer's anchor
+ * is only ever in the future when the clock was set back; its grid then extends backwards too, so
+ * the next tick is still at most one interval away instead of waiting out the correction.
+ */
 private fun gridAfter(base: Long, includeBase: Boolean, interval: Long, after: Long): Long {
-    val first = if (includeBase) 0L else 1L
-    val k = if (after < base) first else maxOf(first, (after - base) / interval + 1)
-    return base + k * interval
+    if (includeBase && after < base) return base
+    return base + (Math.floorDiv(after - base, interval) + 1) * interval
 }
 
 /** A stretch of active time; [open] is [Long.MIN_VALUE] when it reaches back past the scan. */

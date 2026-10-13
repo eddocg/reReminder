@@ -86,11 +86,13 @@ private val DarkColors = darkColorScheme(
  * The activities call `enableEdgeToEdge()` themselves, so this theme only owns colours,
  * typography and shapes — no window/system-bar poking (the old `statusBarColor` write
  * is a no-op from API 35 on).
+ *
+ * Dynamic colour is off by default: the calm green palette is part of what the app is for.
  */
 @Composable
 fun ReReminderTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit,
 ) {
     val colorScheme = when {

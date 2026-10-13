@@ -11,6 +11,7 @@ import com.olaf.rereminder.data.Alert
 import com.olaf.rereminder.data.Reminder
 import com.olaf.rereminder.data.ReminderRepository
 import com.olaf.rereminder.data.nextAlertAfter
+import com.olaf.rereminder.data.snoozeToKeep
 import com.olaf.rereminder.utils.PreferenceHelper
 
 /**
@@ -75,16 +76,15 @@ class ReminderScheduler(context: Context) {
     }
 
     private fun arm(reminder: Reminder, now: Long): Reminder {
-        val snoozeUntil = if (reminder.snoozeUntil > now) {
-            setAlarm(snoozeIntent(reminder.id), reminder.snoozeUntil, reminder.id)
-            reminder.snoozeUntil
+        val next = reminder.nextAlertAfter(now)
+        val snoozeUntil = snoozeToKeep(reminder.snoozeUntil, now, next?.alertAt)
+        if (snoozeUntil > 0L) {
+            setAlarm(snoozeIntent(reminder.id), snoozeUntil, reminder.id)
         } else {
-            // A snooze that came due while the phone was off is not worth ringing late.
             cancelSnoozeAlarm(reminder.id)
-            0L
         }
 
-        val alert = reminder.nextAlertAfter(now) ?: run {
+        val alert = next ?: run {
             // No weekday selected, or no start moment for a calendar reminder: nothing can fire.
             alarmManager.cancel(remindIntent(reminder.id, null))
             return reminder.copy(nextTriggerAt = 0L, nextEventAt = 0L, snoozeUntil = snoozeUntil)

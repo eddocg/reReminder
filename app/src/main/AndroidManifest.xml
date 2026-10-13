@@ -38,7 +38,9 @@
             </intent-filter>
         </activity>
 
-        <!-- Its own task, so dismissing an alarm never reveals the app underneath. -->
+        <!-- Its own task, so dismissing an alarm never reveals the app underneath. The affinity
+             is built from the applicationId: a relative ".alarm" resolves against the shared
+             namespace and would put this alarm into an installed reReminder's alarm task. -->
         <activity
             android:name=".ui.alarm.AlarmActivity"
             android:directBootAware="true"
@@ -46,7 +48,7 @@
             android:exported="false"
             android:launchMode="singleTask"
             android:showWhenLocked="true"
-            android:taskAffinity=".alarm"
+            android:taskAffinity="${applicationId}.alarm"
             android:theme="@style/Theme.ReminderApp"
             android:turnScreenOn="true" />
 

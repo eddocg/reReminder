@@ -155,6 +155,11 @@ data class Reminder(
     val nextEventAt: Long = 0L,
     /** A snoozed alarm rings again at this moment; 0 when nothing is snoozed. */
     val snoozeUntil: Long = 0L,
+    /**
+     * When the timer was paused rather than stopped; 0 otherwise. Purely for the UI: a paused
+     * timer is disabled like a stopped one, and the scheduler treats them the same.
+     */
+    val pausedAtMillis: Long = 0L,
 ) {
     /** True when the user pinned an explicit first-event date and time. */
     val hasStartMoment: Boolean

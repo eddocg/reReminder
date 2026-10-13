@@ -13,6 +13,7 @@ import com.olaf.rereminder.data.Storage
  */
 class PreferenceHelper(context: Context) {
 
+    private val appContext = context.applicationContext
     private val preferences: SharedPreferences = Storage.preferences(context)
 
     /**
@@ -34,12 +35,34 @@ class PreferenceHelper(context: Context) {
         preferences.edit { putString(KEY_SELECTED_RINGTONE, uri?.toString()) }
     }
 
-    /** The default sound for alarm-style reminders; null means the system alarm sound. */
-    fun getAlarmTone(): Uri? =
-        preferences.getString(KEY_ALARM_TONE, null)?.toUri()
+    /** The bundled sound alarms ring with when their sound is "Default". */
+    fun getGentleSound(): GentleSound =
+        GentleSound.fromId(preferences.getString(KEY_GENTLE_SOUND, null))
 
-    fun setAlarmTone(uri: Uri?) {
-        preferences.edit { putString(KEY_ALARM_TONE, uri?.toString()) }
+    fun gentleSoundUri(): Uri = getGentleSound().uri(appContext)
+
+    fun setGentleSound(sound: GentleSound) {
+        preferences.edit { putString(KEY_GENTLE_SOUND, sound.id) }
+    }
+
+    /**
+     * The alarm's in-app loudness in percent, applied on top of the phone's alarm volume — which
+     * the app never changes. Bounded below so an alarm can't be made inaudible by accident here.
+     */
+    fun getAlarmVolumePercent(): Int =
+        preferences.getInt(KEY_ALARM_VOLUME, DEFAULT_ALARM_VOLUME).coerceIn(MIN_ALARM_VOLUME, 100)
+
+    fun setAlarmVolumePercent(percent: Int) {
+        preferences.edit { putInt(KEY_ALARM_VOLUME, percent.coerceIn(MIN_ALARM_VOLUME, 100)) }
+    }
+
+    /** How long an alarm sounds before it goes quiet; Dismiss and Snooze stay available. */
+    fun getSoundTimeoutSeconds(): Int =
+        preferences.getInt(KEY_SOUND_TIMEOUT, DEFAULT_SOUND_TIMEOUT_SECONDS)
+            .takeIf { it in SOUND_TIMEOUT_CHOICES } ?: DEFAULT_SOUND_TIMEOUT_SECONDS
+
+    fun setSoundTimeoutSeconds(seconds: Int) {
+        preferences.edit { putInt(KEY_SOUND_TIMEOUT, seconds) }
     }
 
     fun isVibrationEnabled(): Boolean =
@@ -186,7 +209,9 @@ class PreferenceHelper(context: Context) {
     companion object {
         private const val KEY_MASTER_ENABLED = "master_enabled"
         private const val KEY_SELECTED_RINGTONE = "selected_ringtone"
-        private const val KEY_ALARM_TONE = "alarm_tone"
+        private const val KEY_GENTLE_SOUND = "gentle_sound"
+        private const val KEY_ALARM_VOLUME = "alarm_volume_percent"
+        private const val KEY_SOUND_TIMEOUT = "sound_timeout_seconds"
         private const val KEY_SOUND_ENABLED = "sound_enabled"
         private const val KEY_VIBRATION_ENABLED = "vibration_enabled"
         private const val KEY_VIBRATION_PATTERN = "vibration_pattern"
@@ -212,8 +237,15 @@ class PreferenceHelper(context: Context) {
         const val SORT_CUSTOM = "custom"
         const val SORT_NEXT = "next"
 
-        const val DEFAULT_SNOOZE_MINUTES = 10
+        // A break postponed by five minutes is still a break; ten is half the default interval.
+        const val DEFAULT_SNOOZE_MINUTES = 5
         val SNOOZE_CHOICES = listOf(5, 10, 15, 30)
+
+        const val DEFAULT_ALARM_VOLUME = 70
+        const val MIN_ALARM_VOLUME = 10
+
+        const val DEFAULT_SOUND_TIMEOUT_SECONDS = 60
+        val SOUND_TIMEOUT_CHOICES = listOf(30, 60, 120, 300)
 
         const val VIBRATION_PATTERN_COUNT = 4
     }

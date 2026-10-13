@@ -3,6 +3,7 @@ package com.olaf.rereminder.utils
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.media.AudioManager
 import android.os.Build
 import android.os.PowerManager
 import android.provider.Settings
@@ -89,9 +90,79 @@ data class ReliabilityStatus(
         get() = (listOf(vendor?.slug ?: "-") + issues.map { it.name }).joinToString("|")
 }
 
+/** Something that keeps an alarm from ringing or from showing up, as opposed to delaying it. */
+enum class AlarmBlocker {
+    NOTIFICATIONS,
+    EXACT_ALARMS,
+    FULL_SCREEN,
+    ALARM_VOLUME,
+}
+
+/**
+ * Whether an alarm can do its job on this device right now. The main screen raises every
+ * [blockers] entry; battery optimisation only delays alarms on some phones, so it is left to
+ * Settings and the first-run checklist.
+ */
+data class AlarmReadiness(
+    val notificationsAllowed: Boolean = true,
+    val exactAlarmsAllowed: Boolean = true,
+    /** Android 14+: whether the alarm may take over the lock screen. */
+    val fullScreenAllowed: Boolean = true,
+    /** False when the phone's alarm volume is all the way down. */
+    val alarmVolumeAudible: Boolean = true,
+    val batteryUnrestricted: Boolean = true,
+) {
+    val blockers: List<AlarmBlocker> = buildList {
+        if (!notificationsAllowed) add(AlarmBlocker.NOTIFICATIONS)
+        if (!exactAlarmsAllowed) add(AlarmBlocker.EXACT_ALARMS)
+        if (!fullScreenAllowed) add(AlarmBlocker.FULL_SCREEN)
+        if (!alarmVolumeAudible) add(AlarmBlocker.ALARM_VOLUME)
+    }
+
+    val isReady: Boolean get() = blockers.isEmpty()
+}
+
 object Reliability {
 
     private const val BASE_URL = "https://dontkillmyapp.com"
+
+    fun readiness(context: Context): AlarmReadiness = AlarmReadiness(
+        notificationsAllowed = NotificationHelper.canPost(context, NotificationHelper.CHANNEL_ALARMS),
+        exactAlarmsAllowed = ReminderScheduler(context).canScheduleExactAlarms(),
+        fullScreenAllowed = NotificationHelper.canUseFullScreenIntent(context),
+        alarmVolumeAudible = alarmVolumeAudible(context),
+        batteryUnrestricted = batteryUnrestricted(context),
+    )
+
+    fun alarmVolumeAudible(context: Context): Boolean {
+        val audio = context.getSystemService(AudioManager::class.java) ?: return true
+        return runCatching { audio.getStreamVolume(AudioManager.STREAM_ALARM) > 0 }.getOrDefault(true)
+    }
+
+    /** The system screen that fixes [blocker], best route first. */
+    fun intentsFor(context: Context, blocker: AlarmBlocker): List<Intent> = when (blocker) {
+        AlarmBlocker.NOTIFICATIONS -> notificationIntents(context)
+        AlarmBlocker.EXACT_ALARMS -> exactAlarmIntents(context)
+        AlarmBlocker.FULL_SCREEN -> fullScreenIntents(context)
+        AlarmBlocker.ALARM_VOLUME -> listOf(Intent(Settings.ACTION_SOUND_SETTINGS))
+    }
+
+    fun notificationIntents(context: Context): List<Intent> = listOf(
+        Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+            .putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName),
+        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).setData("package:${context.packageName}".toUri()),
+    )
+
+    /** Android 14+ moved "may cover the lock screen" into a per-app switch of its own. */
+    fun fullScreenIntents(context: Context): List<Intent> {
+        val self = "package:${context.packageName}".toUri()
+        return buildList {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                add(Intent(Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT).setData(self))
+            }
+            addAll(notificationIntents(context))
+        }
+    }
 
     fun vendor(): DkmaVendor? = vendorOf(Build.MANUFACTURER, Build.BRAND)
 

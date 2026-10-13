@@ -100,6 +100,44 @@ class ReliabilityTest {
     }
 
     @Test
+    fun `a device with everything allowed has no alarm blockers`() {
+        assertTrue(AlarmReadiness().isReady)
+        assertTrue(AlarmReadiness().blockers.isEmpty())
+    }
+
+    @Test
+    fun `battery optimisation alone does not block the alarm`() {
+        // Exact alarms still fire under Doze; the battery row stays advice in Settings.
+        assertTrue(AlarmReadiness(batteryUnrestricted = false).isReady)
+    }
+
+    @Test
+    fun `alarm blockers are listed from most to least severe`() {
+        val readiness = AlarmReadiness(
+            notificationsAllowed = false,
+            exactAlarmsAllowed = false,
+            fullScreenAllowed = false,
+            alarmVolumeAudible = false,
+        )
+
+        assertFalse(readiness.isReady)
+        assertEquals(
+            listOf(
+                AlarmBlocker.NOTIFICATIONS,
+                AlarmBlocker.EXACT_ALARMS,
+                AlarmBlocker.FULL_SCREEN,
+                AlarmBlocker.ALARM_VOLUME,
+            ),
+            readiness.blockers,
+        )
+    }
+
+    @Test
+    fun `a muted alarm stream is reported on its own`() {
+        assertEquals(listOf(AlarmBlocker.ALARM_VOLUME), AlarmReadiness(alarmVolumeAudible = false).blockers)
+    }
+
+    @Test
     fun `the vendor name is shown the way the vendor spells it`() {
         assertEquals("Xiaomi", Reliability.vendorNameOf("xiaomi"))
         assertEquals("OnePlus", Reliability.vendorNameOf("OnePlus"))

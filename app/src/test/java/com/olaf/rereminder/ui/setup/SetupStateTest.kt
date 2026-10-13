@@ -111,6 +111,35 @@ class SetupStateTest {
     }
 
     @Test
+    fun `no full-screen step below Android 14`() {
+        assertFalse(SetupStep.FULL_SCREEN in steps().map { it.step })
+    }
+
+    @Test
+    fun `on Android 14 the full-screen step follows exact alarms and is optional`() {
+        val list = buildSetupSteps(
+            needsNotificationPermission = true,
+            notificationsGranted = true,
+            supportsExactAlarmSetting = true,
+            exactAlarmsAllowed = true,
+            batteryUnrestricted = true,
+            vendor = null,
+            vendorGuideSeen = false,
+            supportsFullScreenSetting = true,
+            fullScreenAllowed = false,
+        )
+
+        assertEquals(
+            listOf(SetupStep.NOTIFICATIONS, SetupStep.EXACT_ALARMS, SetupStep.FULL_SCREEN, SetupStep.BATTERY),
+            list.map { it.step },
+        )
+        val state = SetupUiState(steps = list)
+        assertEquals(SetupStep.FULL_SCREEN, state.currentStep)
+        // Without it the alarm still rings as a notification, so it cannot hold setup back.
+        assertTrue(state.canContinue)
+    }
+
+    @Test
     fun `opening the vendor guide is what completes that step`() {
         val before = steps(vendor = DkmaVendor.HUAWEI, vendorGuideSeen = false)
         val after = steps(vendor = DkmaVendor.HUAWEI, vendorGuideSeen = true)
